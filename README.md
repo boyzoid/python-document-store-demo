@@ -4,7 +4,7 @@ A demo for using Python to access a MySQL Document Store
 
 ## Setup
 
-This setup assumes you already have [Python](https://www.python.org/) and [MySQL Shell](https://dev.mysql.com/downloads/shell/) installed and have access to a MySQL database.
+This setup assumes you already have [Python 3.10](https://www.python.org/) and [MySQL Shell](https://dev.mysql.com/downloads/shell/) installed and have access to a MySQL database.
 
 * Open MySQL Shell and connect to your MySQL instance using the following command: `\c {user}:{password}@{host}:33060`
 
