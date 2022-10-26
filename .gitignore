@@ -2,3 +2,5 @@
 /Py-Doc-Store.iml
 .env
 /__pycache__/
+/python-document-store-demo.iml
+/venv/

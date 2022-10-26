@@ -1,6 +1,7 @@
 import os
-
-import falcon, json, mysqlx
+import falcon
+import json
+import mysqlx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,52 +33,52 @@ class MysqlConnector():
         }
         self.pool = mysqlx.get_client(self.connection_url, self.connection_config)
 
-    def listAll(self):
+    def list_all(self):
         session = self.pool.get_session()
         db = session.get_schema(self.db_name)
         collection = db.get_collection(self.coll_name)
         scores = (collection
-                    .find()
-                    .execute()
-                    .fetch_all()
-                    )
+                  .find()
+                  .execute()
+                  .fetch_all()
+                  )
         session.close()
         return json.dumps({"count": len(scores), "scores": scores}, cls=DbDocListJsonEncoder)
 
-    def limitAll(self, limit: int, offset: int = 0):
+    def limit_all(self, limit: int, offset: int = 0):
         session = self.pool.get_session()
         db = session.get_schema(self.db_name)
         collection = db.get_collection(self.coll_name)
         scores = (collection
-                    .find()
-                    .limit(limit)
-                    .offset(offset)
-                    .execute()
-                    .fetch_all()
-                    )
+                  .find()
+                  .limit(limit)
+                  .offset(offset)
+                  .execute()
+                  .fetch_all()
+                  )
         session.close()
         return json.dumps({"count": len(scores), "scores": scores}, cls=DbDocListJsonEncoder)
 
-    def bestScores(self, limit: int = 25):
+    def best_scores(self, limit: int = 25):
         session = self.pool.get_session()
         db = session.get_schema(self.db_name)
         collection = db.get_collection(self.coll_name)
         scores = (collection
-                        .find()
-                        .fields(
-                            [
-                                "firstName",
-                                "lastName",
-                                "score",
-                                "course",
-                                "`date` as datePlayed"
-                            ]
-                        )
-                        .sort(['score asc', '`date` desc'])
-                        .limit(limit)
-                        .execute()
-                        .fetch_all()
-                        )
+                  .find()
+                  .fields(
+            [
+                "firstName",
+                "lastName",
+                "score",
+                "course",
+                "`date` as datePlayed"
+            ]
+        )
+                  .sort(['score asc', '`date` desc'])
+                  .limit(limit)
+                  .execute()
+                  .fetch_all()
+                  )
         session.close()
         return json.dumps({"count": len(scores), "scores": scores}, cls=DbDocListJsonEncoder)
 
@@ -93,33 +94,27 @@ class AppRoot(object):
         resp.text = json.dumps(self.result)
 
 
-api.add_route("/", AppRoot())
-
-
 class ListAllScores(object):
     def on_get(self, req, resp):
-        result = mysql_db.listAll()
-        resp.text = result
-
-
-api.add_route("/list", ListAllScores())
+        resp.text = mysql_db.list_all()
 
 
 class LimitAllScores(object):
     def on_get(self, req, resp, limit, offset=0):
-        result = mysql_db.limitAll(limit, offset)
-        resp.text = result
-
-
-api.add_route("/list/{limit:int}", LimitAllScores())
-api.add_route("/list/{limit:int}/{offset:int}", LimitAllScores())
+        resp.text = mysql_db.limit_all(limit, offset)
 
 
 class GetBestScores(object):
     def on_get(self, req, resp, limit=10):
-        result = mysql_db.bestScores(limit)
-        resp.text = result
+        resp.text = mysql_db.best_scores(limit)
 
+
+api.add_route("/", AppRoot())
+
+api.add_route("/list", ListAllScores())
+
+api.add_route("/list/{limit:int}", LimitAllScores())
+api.add_route("/list/{limit:int}/{offset:int}", LimitAllScores())
 
 api.add_route("/bestScores/", GetBestScores())
 api.add_route("/bestScores/{limit:int}", GetBestScores())
