@@ -15,13 +15,13 @@ class DbDocListJsonEncoder(json.JSONEncoder):
 
 class MysqlConnector():
     def __init__(self):
-        self.db_name = 'py_demo'
-        self.coll_name = 'scores'
+        self.db_name = os.getenv('DB_NAME')
+        self.coll_name = os.getenv('COLLECTION_NAME')
         self.db_user = os.getenv("DB_USER")
         self.db_password = os.getenv("DB_PASSWORD")
         self.db_port = os.getenv("DB_PORT")
         self.db_host = os.getenv("DB_HOST")
-        self.connection_url = f"mysqlx://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/py_demo"
+        self.connection_url = f"mysqlx://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
         self.connection_config = {
             "pooling": {
                 "enabled": True,
